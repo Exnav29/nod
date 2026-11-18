@@ -356,7 +356,6 @@ export function createTasks(options: {
         )
       ).rows[0];
     } catch (error) {
-      // An overlapping task can be admitted after the read above.
       if ((error as { code?: string }).code === '23505')
         throw failure(
           'Another open task already covers this monitoring activity. Reply to that task instead.',
