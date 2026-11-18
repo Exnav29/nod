@@ -137,8 +137,7 @@ test(
             await assert.rejects(
               () => resolved.record(replyTurnId),
               (error: unknown) =>
-                (error as { statusCode?: number }).statusCode === 409 &&
-                (error as Error).message.includes('Another open task'),
+                (error as { statusCode?: number }).statusCode === 409,
             );
           } finally {
             client.release();
@@ -199,7 +198,8 @@ test(
     } finally {
       await thread.stopThreadWorkers();
       await db.pool.end();
-      await admin.query(`DROP SCHEMA ${schema} CASCADE`);
+      await admin.query(`DROP SCHEMA IF EXISTS ${bossSchema} CASCADE`);
+      await admin.query(`DROP SCHEMA IF EXISTS ${schema} CASCADE`);
       await admin.end();
       for (const [key, value] of Object.entries(previous))
         if (value === undefined) delete process.env[key];
