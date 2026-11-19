@@ -136,8 +136,7 @@ test(
             assert.ok(resolved);
             await assert.rejects(
               () => resolved.record(replyTurnId),
-              (error: unknown) =>
-                (error as { statusCode?: number }).statusCode === 409,
+              (error: unknown) => (error as { statusCode?: number }).statusCode === 409,
             );
           } finally {
             client.release();
