@@ -23,6 +23,7 @@ import type {
   WorkUsage,
 } from '../../shared/models';
 import { modelKeyError } from '../../shared/model-keys';
+import { appPages } from '../../shared/app-links';
 import {
   modelProviderInfo,
   modelProviderNames,
@@ -145,12 +146,13 @@ export function ModelKeyHelp({
         <a href={`https://${info.keyUrl}`} target="_blank" rel="noreferrer">
           Get API key
         </a>
-        {info.catalog === 'bundled' && ' Access checked on first use.'}
+        {info.catalog === 'bundled' && ' Access is checked after you select a model.'}
       </p>
       {provider === 'google' && (
         <p className={className}>
+          Gemini 4 Argon requires paid API access. Gemini 3.8 Flash is a lower-cost option with{' '}
           <a href="https://ai.google.dev/gemini-api/docs/pricing" target="_blank" rel="noreferrer">
-            Free tier available with limits.
+            limited free access.
           </a>{' '}
           Google sign-in and AI app plans are separate from API access.
         </p>
@@ -191,7 +193,7 @@ function providerDescription(provider: ModelProvider) {
     case 'anthropic':
       return 'API key only. Claude plans can’t be used here.';
     case 'google':
-      return 'Gemini with an AI Studio key · Free tier available';
+      return 'Gemini with an AI Studio key · Argon requires paid access';
     case 'openrouter':
       return 'Many models with one API key';
     case 'amazon-bedrock':
@@ -730,11 +732,23 @@ export function ModelSettings({ onDirtyChange }: { onDirtyChange?(dirty: boolean
                             </span>
                           )}
                           {data.selection?.connectionId === connection.id && (
-                            <span className="model-connection-selected">Current model</span>
+                            <span className="model-connection-meta model-connection-selected">
+                              Current model:{' '}
+                              {connection.models.find(
+                                (model) => model.id === data.selection?.modelId,
+                              )?.name ?? data.selection.modelId}
+                            </span>
                           )}
                         </div>
                       </div>
                       <div className="model-service-actions">
+                        {data.selection?.connectionId === connection.id && available && (
+                          <ModelPicker
+                            appearance="quiet"
+                            label="Change model"
+                            manageConnections={false}
+                          />
+                        )}
                         {connection.status === 'reconnect' && !connection.managed && (
                           <Button
                             type="button"
@@ -1308,7 +1322,7 @@ export function ModelPicker({
         model &&
         connection?.status === 'reconnect' && (
           <a className="model-needs-reconnect" href="/settings/models">
-            Reconnect in Settings &gt; Models
+            Reconnect in {appPages['/settings/models']}
           </a>
         )}
       <Dialog
@@ -1461,6 +1475,14 @@ export function ModelPicker({
                             <span className="model-option-recommended">Recommended</span>
                           )}
                         </span>
+                        {source.provider === 'google' && item.id === 'gemini-4-argon' && (
+                          <span className="model-option-detail">Requires paid API access</span>
+                        )}
+                        {source.provider === 'google' && item.id === 'gemini-3.8-flash' && (
+                          <span className="model-option-detail">
+                            Lower cost · Limited free access
+                          </span>
+                        )}
                         {item.audio && (
                           <span className="model-option-detail">
                             {item.textModelName
