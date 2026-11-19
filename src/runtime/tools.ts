@@ -621,7 +621,7 @@ export const toolDefinitions = {
           activity: Type.Optional(
             Type.Object(
               {
-                objective: Type.String({ minLength: 1, maxLength: 500 }),
+                objective: Type.String({ minLength: 1, maxLength: 500, pattern: '\\S' }),
                 sourceIds: Type.Optional(
                   Type.Array(Type.String({ minLength: 1, maxLength: 200 }), { maxItems: 20 }),
                 ),
